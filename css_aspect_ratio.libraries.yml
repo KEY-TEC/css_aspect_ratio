@@ -1,0 +1,6 @@
+css_aspect_ratio.module:
+  version: VERSION
+  css:
+    component:
+      css/css-aspect-ratio.css: {}
+

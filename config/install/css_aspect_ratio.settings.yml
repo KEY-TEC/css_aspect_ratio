@@ -1,0 +1,4 @@
+image_fields: {  }
+alter_tag:
+  img: img
+  iframe: 0

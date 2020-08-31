@@ -1,0 +1,199 @@
+<?php
+
+/**
+ * @file
+ * CSS Aspect Ratio module file.
+ */
+
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Field\FormatterInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+
+/**
+ * Implements template_preprocess_image().
+ */
+function css_aspect_ratio_preprocess_image(&$variables) {
+  if (array_key_exists('data-css-aspect-ratio', $variables['attributes'])) {
+    // We don't need `data-lazy` attribute anymore.
+    unset($variables['attributes']['data-css-aspect-ratio']);
+    $variables['attributes']['class'][] = 'css-aspect-ratio__image';
+    /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
+    $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
+
+  }
+}
+
+/**
+ * Implements template_preprocess_responsive_image().
+ */
+function css_aspect_ratio_preprocess_responsive_image(&$variables) {
+  if (array_key_exists('data-css-aspect-ratio', $variables['attributes'])) {
+    unset($variables['attributes']['data-css-aspect-ratio']);
+    // The `data-lazy` attribute will be removed in `lazy_preprocess_image()`.
+    $config = \Drupal::config('css_aspect_ratio.settings')->get();
+  }
+}
+
+
+/**
+ * Saves the rewritten stylesheet to disk.
+ */
+function _css_aspect_ratio_save_stylesheet($file, $style) {
+  \Drupal::service('file_system')->saveData(
+    $style,
+    $file,
+    FileSystemInterface::EXISTS_REPLACE
+  );
+
+  // Set standard file permissions for webserver-generated files.
+  \Drupal::service('file_system')->chmod($file);
+}
+
+function _css_aspect_ratio_generate_stylesheet($css_path) {
+  /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
+  $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
+  _css_aspect_ratio_save_stylesheet($css_path, $aspect_ratio_manager->getCSS());
+}
+
+function css_aspect_ratio_library_info_alter(&$libraries, $extension) {
+  $css_path = 'public://css-aspect-ratio.css';
+
+  $name = 'css_aspect_ratio.module';
+  if (isset($libraries[$name]['css'])) {
+    _css_aspect_ratio_generate_stylesheet($css_path);
+    // Add dynamic stylesheet.
+    $libraries[$name]['css']['component'][$css_path] = [];
+  }
+}
+
+
+/**
+ * Supported field formatters that Lazy-load can be enabled.
+ *
+ * Other modules can override this list of the field formatters via a
+ * `hook_css_aspect_ratio_field_formatters_alter(&$formatters)`  hook.
+ *
+ * @return array
+ *   Returns a list of field formatters that supports lazy-loading.
+ */
+function css_aspect_ratio_field_formatters() {
+  $formatters = [];
+
+  $moduleHandler = \Drupal::moduleHandler();
+  if ($moduleHandler->moduleExists('colorbox')) {
+    $formatters[] = 'colorbox';
+  }
+  if ($moduleHandler->moduleExists('image')) {
+    $formatters[] = 'image';
+  }
+  if ($moduleHandler->moduleExists('media')) {
+    $formatters[] = 'media_thumbnail';
+  }
+  if ($moduleHandler->moduleExists('responsive_image')) {
+    $formatters[] = 'responsive_image';
+  }
+
+  \Drupal::service('module_handler')->alter(
+    'css_aspect_ratio_field_formatters',
+    $formatters
+  );
+  $formatters = array_values(array_unique($formatters));
+
+  return $formatters;
+}
+
+function css_aspect_ratio_preprocess_image_formatter(&$variables) {
+  if (array_key_exists(
+    'data-css-aspect-ratio',
+    $variables['item_attributes']
+  )) {
+    /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
+    $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
+    $variables['image']['#prefix'] = \Drupal\Component\Render\FormattableMarkup::'<div style="--css-aspect-ratio: ' . $aspect_ratio_manager->getPaddingBottom(
+        $variables['image']['#width'],
+        $variables['image']['#height']
+      ) . '%">';
+    $variables['image']['#suffix'] = '</div>';
+  }
+}
+
+function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
+}
+
+/**
+ * Implements template_preprocess_field().
+ */
+function css_aspect_ratio_preprocess_field(&$variables) {
+  $element = $variables['element'];
+  if (!empty($element['#third_party_settings']) && !empty($element['#third_party_settings']['css_aspect_ratio']['css_aspect_ratio_image'])) {
+    foreach ($variables['items'] as $key => $item) {
+      $variables['items'][$key]['content']['#item_attributes']['data-css-aspect-ratio'] = TRUE;
+    }
+  }
+}
+
+
+/**
+ * Implements hook_field_formatter_third_party_settings_form().
+ */
+function css_aspect_ratio_field_formatter_third_party_settings_form(
+  FormatterInterface $plugin,
+  FieldDefinitionInterface $field_definition,
+  $view_mode,
+  array $form,
+  FormStateInterface $form_state
+) {
+  $element = [];
+
+  if (in_array(
+    $plugin->getPluginId(),
+    css_aspect_ratio_field_formatters(),
+    TRUE
+  )) {
+    $default_value = $plugin->getThirdPartySetting(
+      'css_aspect_ratio',
+      'css_aspect_ratio_image',
+      FALSE
+    );
+    $image_fields = \Drupal::config('css_aspect_ratio.settings')->get(
+      'image_fields'
+    );
+    $image_fields = is_array($image_fields) ? $image_fields : [];
+    $key = '';
+
+    if ($field_definition instanceof FieldConfig) {
+      $key = str_replace('.', '--', $field_definition->id() . '.' . $view_mode);
+    }
+    elseif ($field_definition instanceof BaseFieldDefinition) {
+      $entity_type = $form['#entity_type'];
+      $bundle = $form['#bundle'];
+
+      $key = "${entity_type}--${bundle}--field_media_image--${view_mode}";
+    }
+
+    if (!isset($image_fields[$key]) || (isset($image_fields[$key]) && ($default_value !== $image_fields[$key]))) {
+      $image_fields[$key] = (bool) $default_value;
+      // Remove fields if lazy is disabled.
+      if (!$image_fields[$key]) {
+        unset($image_fields[$key]);
+      }
+
+      $config = \Drupal::configFactory()->getEditable(
+        'css_aspect_ratio.settings'
+      );
+      $config->set('image_fields', $image_fields)->save();
+    }
+
+    $element['css_aspect_ratio_image'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Enable CSS Aspect Ratio'),
+      '#default_value' => $default_value,
+    ];
+  }
+
+  return $element;
+}

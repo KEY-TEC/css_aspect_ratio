@@ -1,0 +1,9 @@
+name: CSS Aspect Ratio
+type: module
+description: Creates an aspect ratio CSS container for image and picture elements.
+core_version_requirement: ^8 || ^9
+package: User interface
+dependencies:
+  - drupal:responsive_image
+  - drupal:breakpoint
+  - drupal:image

@@ -1,0 +1,4 @@
+services:
+  css_aspect_ratio.manager:
+    class: Drupal\css_aspect_ratio\AspectRatioManager
+    arguments: ['@entity.manager', '@breakpoint.manager']

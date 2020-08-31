@@ -1,0 +1,19 @@
+css_aspect_ratio.settings:
+  type: config_object
+  mapping:
+    image_fields:
+      type: sequence
+      label: 'Image fields'
+      sequence:
+        type: string
+        label: 'Image field'
+    alter_tag:
+      type: mapping,k
+      label: 'Inline elements loaded via filter'
+      mapping:
+        img:
+          type: string
+          label: 'Enable for images'
+        iframe:
+          type: string
+          label: 'Enable for iframes'
