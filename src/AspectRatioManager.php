@@ -42,10 +42,9 @@ class AspectRatioManager implements AspectRatioManagerInterface {
   public function getCSS() {
     $css = '';
     $groups = $this->breakpointManager->getGroups();
-    $queries = [];
     // Fixed Aspect Ratio
     $css .= ".css-aspect-ratio {\n";
-    $css .= "padding-bottom: var(--css-aspect-ratio);\n";
+    $css .= "padding-top: var(--css-aspect-ratio-padding-top);\n";
     $css .= "}\n";
 
     // Responsive Aspect Ratio
@@ -55,7 +54,8 @@ class AspectRatioManager implements AspectRatioManagerInterface {
       foreach ($breakpoints as $breakpoint_name => $breakpoint) {
         $variable_name = Html::cleanCssIdentifier($breakpoint_name . '--css-aspect-ratio');
         if (!empty($breakpoint->getMediaQuery())) {
-          $css .= "@media $breakpoint->getMediaQuery() {\n";
+          $media_breakpoint = $breakpoint->getMediaQuery();
+          $css .= "@media $media_breakpoint {\n";
         }
         $css .= "padding-bottom: var(--$variable_name);\n";
         if (!empty($breakpoint->getMediaQuery())) {
@@ -64,10 +64,31 @@ class AspectRatioManager implements AspectRatioManagerInterface {
       }
       $css .= "}\n";
     }
-    return $queries;
+    return $css;
   }
 
   public function getPaddingBottom($width, $height) {
-    return ($width / $height) * 100;
+    return ($height / $width) * 100;
+  }
+
+  public function getResponsivePrefix($responsive_image_style, $responsive_image) {
+    $responsive_prefix = [];
+    $image_style_mapping = $responsive_image_style->getKeyedImageStyleMappings();
+    foreach ($image_style_mapping as $image_style) {
+      $loaded_image_style = \Drupal\image\Entity\ImageStyle::load($image_style['1x']['image_mapping']);
+      $dimensions = [
+        "width" => $responsive_image['#width'],
+        "height" => $responsive_image['#height']
+      ];
+      $loaded_image_style->transformDimensions($dimensions, $responsive_image['#uri']);
+      $aspect_ratio = $dimensions['height'] / $dimensions['width'] * 100;
+      $css_prefix = $image_style['1x']['breakpoint_id'];
+      $variable_name = Html::cleanCssIdentifier($css_prefix . '--css-aspect-ratio');
+      $responsive_prefix += [
+        $variable_name => $aspect_ratio
+      ];
+    }
+
+    return $responsive_prefix;
   }
 }

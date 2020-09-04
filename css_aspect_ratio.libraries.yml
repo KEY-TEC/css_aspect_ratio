@@ -1,4 +1,4 @@
-css_aspect_ratio.module:
+css_aspect_ratio:
   version: VERSION
   css:
     component:

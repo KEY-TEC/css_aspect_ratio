@@ -30,7 +30,15 @@ selenium:
 
 commands:
   drupal:site-setup:
-    - { task: "symlink", from: "../../..", to: "${drupal.root}/modules/custom/css_aspect_ratio" }
+    - { task: "symlink", from: "../../../../config", to: "${drupal.root}/modules/custom/css_aspect_ratio/config" }
+    - { task: "symlink", from: "../../../../css", to: "${drupal.root}/modules/custom/css_aspect_ratio/css" }
+    - { task: "symlink", from: "../../../../src", to: "${drupal.root}/modules/custom/css_aspect_ratio/src" }
+    - { task: "symlink", from: "../../../../templates", to: "${drupal.root}/modules/custom/css_aspect_ratio/templates" }
+    - { task: "symlink", from: "../../../../tests", to: "${drupal.root}/modules/custom/css_aspect_ratio/tests" }
+    - { task: "symlink", from: "../../../../css_aspect_ratio.info.yml", to: "${drupal.root}/modules/custom/css_aspect_ratio/css_aspect_ratio.info.yml" }
+    - { task: "symlink", from: "../../../../css_aspect_ratio.libraries.yml", to: "${drupal.root}/modules/custom/css_aspect_ratio/css_aspect_ratio.libraries.yml" }
+    - { task: "symlink", from: "../../../../css_aspect_ratio.module", to: "${drupal.root}/modules/custom/css_aspect_ratio/css_aspect_ratio.module" }
+    - { task: "symlink", from: "../../../../css_aspect_ratio.services.yml", to: "${drupal.root}/modules/custom/css_aspect_ratio/css_aspect_ratio.services.yml" }
     # Generate settings.testing.php, it will be used when running functional tests.
     - { task: "process-php", type: "write", config: "drupal.settings", source: "${drupal.root}/sites/default/default.settings.php", destination: "${drupal.root}/sites/default/settings.testing.php", override: true }
     - { task: "run", command: "drupal:drush-setup" }
