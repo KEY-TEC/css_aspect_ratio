@@ -1,6 +1,10 @@
 css_aspect_ratio.settings:
   type: config_object
+  label: 'Css Aspect Ratio Settings'
   mapping:
+    breakpoints:
+      type: String[]
+      label: 'Enable Css Aspect Ratio for breakpoints'
     image_fields:
       type: sequence
       label: 'Image fields'
