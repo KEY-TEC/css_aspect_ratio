@@ -49,17 +49,22 @@ class AspectRatioManager implements AspectRatioManagerInterface {
 
     // Responsive Aspect Ratio
     foreach ($groups as $group => $group_label) {
-      $css .= '.css-aspect-ratio--' . Html::cleanCssIdentifier($group) . " {\n";
-      $breakpoints = $this->breakpointManager->getBreakpointsByGroup($group);
+      $css_class_name = '.css-aspect-ratio--' . Html::cleanCssIdentifier($group);
+      $css .= $css_class_name . " {\n";
       $css .= "position: relative;\n";
       $css .= "width: 100%;\n";
+      $css .= "}\n";
+
+      $breakpoints = $this->breakpointManager->getBreakpointsByGroup($group); bist
       foreach ($breakpoints as $breakpoint_name => $breakpoint) {
         $variable_name = Html::cleanCssIdentifier($breakpoint_name . '--css-aspect-ratio');
         if (!empty($breakpoint->getMediaQuery())) {
           $media_breakpoint = $breakpoint->getMediaQuery();
           $css .= "@media $media_breakpoint {\n";
         }
+        $css .= $css_class_name. "{\n";
         $css .= "padding-bottom: var(--$variable_name);\n";
+        $css .= "}\n";
         if (!empty($breakpoint->getMediaQuery())) {
           $css .= "}\n";;
         }

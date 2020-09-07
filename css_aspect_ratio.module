@@ -18,10 +18,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 function css_aspect_ratio_preprocess_responsive_image(&$variables) {
   if (array_key_exists('data-css-aspect-ratio', $variables['attributes'])) {
     unset($variables['attributes']['data-css-aspect-ratio']);
-    // The `data-lazy` attribute will be removed in `lazy_preprocess_image()`.
-    $config = \Drupal::config('css_aspect_ratio.settings')->get();
   }
-
 }
 
 
@@ -80,6 +77,9 @@ function css_aspect_ratio_field_formatters() {
   }
   if ($moduleHandler->moduleExists('responsive_image')) {
     $formatters[] = 'responsive_image';
+  }
+  if ($moduleHandler->moduleExists('media_responsive_thumbnail')) {
+    $formatters[] = 'media_responsive_thumbnail';
   }
 
   \Drupal::service('module_handler')->alter(
