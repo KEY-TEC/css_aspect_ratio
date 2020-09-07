@@ -42,10 +42,12 @@ class AspectRatioManager implements AspectRatioManagerInterface {
    */
   public function getCSS() {
     $css = '';
-    $groups = $this->breakpointManager->getGroups();
+    $groups = $this->getActiveBreakpoints();
 
     // Responsive Aspect Ratio
     foreach ($groups as $group => $group_label) {
+      $settings_breakpoints = \Drupal::configFactory()->get('css_aspect_ratio.config')->get('breakpoints');
+
       $css_class_name = '.css-aspect-ratio--' . Html::cleanCssIdentifier($group);
       $css .= $css_class_name . " {\n";
       $css .= "position: relative;\n";
@@ -70,6 +72,25 @@ class AspectRatioManager implements AspectRatioManagerInterface {
       }
     }
     return $css;
+  }
+
+  public function getActiveBreakpoints() {
+    $active_breakpoints = [];
+    $settings_breakpoints = \Drupal::configFactory()->get('css_aspect_ratio.config')->get('breakpoints');
+    $groups = $this->breakpointManager->getGroups();
+
+    foreach ($groups as $group => $group_label) {
+      foreach ($settings_breakpoints as $settings_breakpoint) {
+        if ($group === $settings_breakpoint) {
+          $active_breakpoints += [$group => $group_label];
+        }
+      }
+    }
+    if ($active_breakpoints == NULL) {
+      $active_breakpoints = $groups;
+    }
+
+    return$active_breakpoints;
   }
 
   public function getPaddingBottom($width, $height) {
