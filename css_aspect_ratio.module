@@ -121,18 +121,22 @@ function css_aspect_ratio_preprocess_image(&$variables) {
     'data-css-aspect-ratio',
     $variables['attributes']
   )) {
-    $variables['attributes']['class'] = 'css-aspect-ratio__image';
+    $variables['attributes']['class'][] = 'css-aspect-ratio__image';
   }
 }
 
 function css_aspect_ratio_theme_suggestions_field_alter(array &$suggestions, array $variables, $hook) {
-  if ($variables['element']['#field_type'] == 'image' && $variables['element']['#third_party_settings']['css_aspect_ratio']['css_aspect_ratio_image'] == 1) {
+  if ($variables['element']['#field_type'] == 'image' &&
+    isset($variables['element']['#third_party_settings']['css_aspect_ratio']['css_aspect_ratio_image']) &&
+    $variables['element']['#third_party_settings']['css_aspect_ratio']['css_aspect_ratio_image'] == 1) {
     $suggestions[] = $hook . '__' . $variables['element']['#field_type'] . '__' . key($variables['element']['#third_party_settings']['css_aspect_ratio']);
   }
 }
 
 function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
-  if (array_key_exists(
+  if (
+    is_array($variables['item_attributes']) &&
+    array_key_exists(
     'data-css-aspect-ratio',
     $variables['item_attributes']
   )) {
