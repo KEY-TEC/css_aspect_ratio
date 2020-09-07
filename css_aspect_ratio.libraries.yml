@@ -4,3 +4,9 @@ css_aspect_ratio:
     component:
       css/css-aspect-ratio.css: {}
 
+css_aspect_ratio.default_theme:
+  version: VERSION
+  css:
+    component:
+      css/css-aspect-ratio-default-theme.css: {}
+

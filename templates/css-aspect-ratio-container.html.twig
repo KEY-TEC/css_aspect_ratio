@@ -1,4 +1,5 @@
 {{ attach_library('css_aspect_ratio/css_aspect_ratio') }}
-<div {{ attributes }}>
+{{ attach_library('css_aspect_ratio/css_aspect_ratio.default_theme') }}
+<div {{ attributes.addClass('css-aspect-ratio--theme') }}>
   {{ element }}
 </div>
