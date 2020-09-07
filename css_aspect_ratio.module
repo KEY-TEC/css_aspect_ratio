@@ -144,14 +144,15 @@ function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
     foreach ($responsive_prefixes as $name => $value) {
       $css .= '--' . $name . ': ' . $value . '%; ';
     }
+    $aspect_ratio_class = 'css-aspect-ratio--' . $responsive_image_style->getBreakpointGroup();
     $x = "";
     $variables['responsive_image']['#theme_wrappers']['css_aspect_ratio_container'] = [
       '#attributes' => [
         'style' => [
-          '--bartikwide--css-aspect-ratio: ' . $image_style_height / $image_style_width * 100 . '%'
+          $css
         ],
         'class' => [
-          'css-aspect-ratio'
+          $aspect_ratio_class
         ],
       ],
     ];

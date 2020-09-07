@@ -51,6 +51,8 @@ class AspectRatioManager implements AspectRatioManagerInterface {
     foreach ($groups as $group => $group_label) {
       $css .= '.css-aspect-ratio--' . Html::cleanCssIdentifier($group) . " {\n";
       $breakpoints = $this->breakpointManager->getBreakpointsByGroup($group);
+      $css .= "position: relative;\n";
+      $css .= "width: 100%;\n";
       foreach ($breakpoints as $breakpoint_name => $breakpoint) {
         $variable_name = Html::cleanCssIdentifier($breakpoint_name . '--css-aspect-ratio');
         if (!empty($breakpoint->getMediaQuery())) {
