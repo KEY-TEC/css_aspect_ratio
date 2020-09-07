@@ -39,6 +39,7 @@ function _css_aspect_ratio_save_stylesheet($file, $style) {
 }
 
 function _css_aspect_ratio_generate_stylesheet($css_path) {
+
   /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
   $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
   _css_aspect_ratio_save_stylesheet($css_path, $aspect_ratio_manager->getCSS());
@@ -145,7 +146,6 @@ function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
       $css .= '--' . $name . ': ' . $value . '%; ';
     }
     $aspect_ratio_class = 'css-aspect-ratio--' . $responsive_image_style->getBreakpointGroup();
-    $x = "";
     $variables['responsive_image']['#theme_wrappers']['css_aspect_ratio_container'] = [
       '#attributes' => [
         'style' => [

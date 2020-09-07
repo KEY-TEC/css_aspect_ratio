@@ -77,18 +77,23 @@ class AspectRatioManager implements AspectRatioManagerInterface {
     $responsive_prefix = [];
     $image_style_mapping = $responsive_image_style->getKeyedImageStyleMappings();
     foreach ($image_style_mapping as $image_style) {
-      $loaded_image_style = \Drupal\image\Entity\ImageStyle::load($image_style['1x']['image_mapping']);
+      $current_pixel_ratio = current($image_style);
+      if ($current_pixel_ratio != NULL) {
+      $loaded_image_style = \Drupal\image\Entity\ImageStyle::load($current_pixel_ratio['image_mapping']);
       $dimensions = [
         "width" => $responsive_image['#width'],
         "height" => $responsive_image['#height']
       ];
       $loaded_image_style->transformDimensions($dimensions, $responsive_image['#uri']);
       $aspect_ratio = $dimensions['height'] / $dimensions['width'] * 100;
-      $css_prefix = $image_style['1x']['breakpoint_id'];
+      $css_prefix = $current_pixel_ratio['breakpoint_id'];
       $variable_name = Html::cleanCssIdentifier($css_prefix . '--css-aspect-ratio');
       $responsive_prefix += [
         $variable_name => $aspect_ratio
       ];
+    } else {
+        // @TODO
+      }
     }
 
     return $responsive_prefix;
