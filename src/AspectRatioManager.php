@@ -80,23 +80,29 @@ class AspectRatioManager implements AspectRatioManagerInterface {
     $groups = $this->breakpointManager->getGroups();
 
     foreach ($groups as $group => $group_label) {
-      foreach ($settings_breakpoints as $settings_breakpoint) {
-        if ($group === $settings_breakpoint) {
-          $active_breakpoints += [$group => $group_label];
-        }
+      if (isset($settings_breakpoints[$group])
+        && $settings_breakpoints[$group] !=='0'
+      ) {
+        $active_breakpoints += [$group => $group_label];
       }
     }
-    if ($active_breakpoints == NULL) {
+    if (empty($active_breakpoints)) {
       $active_breakpoints = $groups;
     }
 
-    return$active_breakpoints;
+    return $active_breakpoints;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPaddingBottom($width, $height) {
     return ($height / $width) * 100;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getResponsivePrefix(ResponsiveImageStyle $responsive_image_style, $responsive_image) {
     $responsive_prefix = [];
     $dimensions = [
