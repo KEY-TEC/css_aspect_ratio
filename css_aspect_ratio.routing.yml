@@ -1,0 +1,7 @@
+css_aspect_ratio.css_aspect_ratio_config_form:
+  path: '/admin/config/media/css_aspect_ratio'
+  defaults:
+    _form: '\Drupal\css_aspect_ratio\Form\ConfigForm'
+    _title: 'Css Aspect Ratio Settings'
+  requirements:
+    _access: 'TRUE'
