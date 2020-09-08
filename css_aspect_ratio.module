@@ -11,16 +11,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Field\BaseFieldDefinition;
-
-/**
- * Implements template_preprocess_responsive_image().
- */
-function css_aspect_ratio_preprocess_responsive_image(&$variables) {
-  if (array_key_exists('data-css-aspect-ratio', $variables['attributes'])) {
-    unset($variables['attributes']['data-css-aspect-ratio']);
-  }
-}
-
+use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 
 /**
  * Saves the rewritten stylesheet to disk.
@@ -142,7 +133,7 @@ function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
   )) {
     /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
     $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
-    $responsive_image_style = \Drupal\responsive_image\Entity\ResponsiveImageStyle::load($variables['responsive_image_style_id']);
+    $responsive_image_style = ResponsiveImageStyle::load($variables['responsive_image_style_id']);
     $responsive_image = $variables['responsive_image'];
     $responsive_prefixes = $aspect_ratio_manager->getResponsivePrefix($responsive_image_style, $responsive_image);
     $css = '';
