@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
+use Drupal\Component\Utility\Html;
 
 /**
  * Saves the rewritten stylesheet to disk.
@@ -91,9 +92,9 @@ function css_aspect_ratio_preprocess_image_formatter(&$variables) {
     /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
     $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
     $aspect_ratio_padding = $aspect_ratio_manager->getPaddingBottom(
-        $variables['image']['#width'],
-        $variables['image']['#height']
-      );
+      $variables['image']['#width'],
+      $variables['image']['#height']
+    );
     $variables['image']['#theme_wrappers']['css_aspect_ratio_container'] = [
       '#attributes' => [
         'style' => [
@@ -128,9 +129,9 @@ function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
   if (
     is_array($variables['item_attributes']) &&
     array_key_exists(
-    'data-css-aspect-ratio',
-    $variables['item_attributes']
-  )) {
+      'data-css-aspect-ratio',
+      $variables['item_attributes']
+    )) {
     /** @var \Drupal\css_aspect_ratio\AspectRatioManagerInterface $aspect_ratio_manager */
     $aspect_ratio_manager = \Drupal::service('css_aspect_ratio.manager');
     $responsive_image_style = ResponsiveImageStyle::load($variables['responsive_image_style_id']);
@@ -140,7 +141,7 @@ function css_aspect_ratio_preprocess_responsive_image_formatter(&$variables) {
     foreach ($responsive_prefixes as $name => $value) {
       $css .= '--' . $name . ': ' . $value . '%; ';
     }
-    $aspect_ratio_class = 'css-aspect-ratio--' . $responsive_image_style->getBreakpointGroup();
+    $aspect_ratio_class = 'css-aspect-ratio--' . Html::cleanCssIdentifier($responsive_image_style->getBreakpointGroup());
     $variables['responsive_image']['#theme_wrappers']['css_aspect_ratio_container'] = [
       '#attributes' => [
         'style' => [
