@@ -85,7 +85,7 @@ function css_aspect_ratio_field_formatters() {
 }
 
 function css_aspect_ratio_preprocess_image_formatter(&$variables) {
-  if (array_key_exists(
+  if (isset($variables['item_attributes']) && array_key_exists(
     'data-css-aspect-ratio',
     $variables['item_attributes']
   )) {
