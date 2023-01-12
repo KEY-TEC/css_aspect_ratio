@@ -4,4 +4,4 @@ css_aspect_ratio.css_aspect_ratio_config_form:
     _form: '\Drupal\css_aspect_ratio\Form\ConfigForm'
     _title: 'Css Aspect Ratio Settings'
   requirements:
-    _access: 'TRUE'
+    _permission: 'administer responsive images'
